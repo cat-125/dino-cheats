@@ -4,6 +4,7 @@ const cheats = {
 	tracers: false,
 	hitboxes: false,
 	outerHitboxes: false,
+	trajectory: false,
 	jumpHelper: false
 };
 
@@ -136,6 +137,10 @@ function initCheats() {
 	const outerHitboxesSwitch = new cheatgui.Switch('Show outer hitboxes');
 	outerHitboxesSwitch.onChange((_, val) => cheats.outerHitboxes = val);
 	visualMods.append(outerHitboxesSwitch);
+
+	const trajectorySwitch = new cheatgui.Switch('Show trajectory');
+	trajectorySwitch.onChange((_, val) => cheats.trajectory = val);
+	visualMods.append(trajectorySwitch);
 
 	const jumpHelperSwitch = new cheatgui.Switch('Jump helper');
 	jumpHelperSwitch.onChange((_, val) => cheats.jumpHelper = val);
@@ -391,6 +396,10 @@ function initCheats() {
 			}
 
 			if (cheats.jumpHelper) {
+				// TODO
+			}
+
+			if (cheats.trajectory) {
 				drawTrajectory(ctx, this.tRex.xPos, this.tRex.yPos, this.tRex.config.WIDTH,
 					this.tRex.config.HEIGHT, this.currentSpeed,
 					this.tRex.jumpVelocity,
@@ -413,7 +422,7 @@ function initCheats() {
 		});
 		ctx.restore();
 
-		if (cheats.hitboxes) {
+		if (cheats.hitboxes && this.horizon.obstacles.length > 0) {
 			const tRexBox = new CollisionBox(
 				this.tRex.xPos + 1,
 				this.tRex.yPos + 1,
@@ -421,7 +430,7 @@ function initCheats() {
 				this.tRex.config.HEIGHT - 2);
 			const tRexCollisionBoxes = this.tRex.ducking ?
 				Trex.collisionBoxes.DUCKING : Trex.collisionBoxes.RUNNING;
-			const obstacle = this.horizon.obstacles[0]
+			const obstacle = this.horizon.obstacles[0];
 			const obstacleBox = new CollisionBox(
 				obstacle.xPos + 1,
 				obstacle.yPos + 1,
@@ -506,7 +515,7 @@ function drawTrajectory(ctx, x, y, width, height, vx, vy, gravity) {
 		// Draw a line between the current position and the next position on the canvas
 		ctx.lineTo(x + width / 2, y + height / 2);
 
-		if (y < cfg.MAX_JUMP_HEIGHT) speedDrop = true;
+		//if (y < cfg.MAX_JUMP_HEIGHT) speedDrop = true;
 	}
 
 	ctx.stroke();

@@ -5,7 +5,9 @@ const cheats = {
 	hitboxes: false,
 	outerHitboxes: false,
 	trajectory: false,
-	jumpHelper: false
+	jumpHelper: false,
+	noSpeedIncrease: false,
+	obstcaleBypass: false
 };
 
 function initCheats() {
@@ -47,6 +49,10 @@ function initCheats() {
 	});
 	globalMods.append(scoreInput);
 	globalMods.append(scoreBtn);
+
+	const speedIncrease = new cheatgui.Switch('No speed increase');
+	speedIncrease.onChange((_, val) => cheats.noSpeedIncrease = val);
+	globalMods.append(speedIncrease);
 
 	const gameOverBtn = new cheatgui.Button('End game');
 	gameOverBtn.onClick(() => {
@@ -92,15 +98,11 @@ function initCheats() {
 	playerMods.append(noClipSwitch);
 
 	const freezeSwitch = new cheatgui.Switch('Freeze');
-	freezeSwitch.onChange((_, val) => {
-		Runner.instance_.playingIntro = val;
-	});
+	freezeSwitch.onChange((_, val) => Runner.instance_.playingIntro = val);
 	playerMods.append(freezeSwitch);
 
 	const airWalkSwitch = new cheatgui.Switch('Air walk');
-	airWalkSwitch.onChange((_, val) => {
-		Runner.instance_.tRex.groundYPos = val ? 0 : 93;
-	});
+	airWalkSwitch.onChange((_, val) => Runner.instance_.tRex.groundYPos = val ? 0 : 93);
 	playerMods.append(airWalkSwitch);
 
 	let autoPlayInterval;
@@ -113,6 +115,10 @@ function initCheats() {
 		}
 	});
 	playerMods.append(autoPlaySwitch);
+
+	const obstcaleBypassSwitch = new cheatgui.Switch('Obstcale bypass');
+	obstcaleBypassSwitch.onChange((_, val) => cheats.obstcaleBypass = val);
+	playerMods.append(obstcaleBypassSwitch);
 
 	/******************************
 	***** Visuals *****************
@@ -339,9 +345,16 @@ function initCheats() {
 			if (!collision) {
 				this.distanceRan += this.currentSpeed * deltaTime / this.msPerFrame;
 
-				if (this.currentSpeed < this.config.MAX_SPEED) {
+				if (this.currentSpeed < this.config.MAX_SPEED && !cheats.noSpeedIncrease) {
 					this.currentSpeed += this.config.ACCELERATION;
 				}
+			} else if (cheats.obstcaleBypass) {
+				this.tRex.yPos = this.horizon.obstacles[0].yPos
+					- this.horizon.obstacles[0].typeConfig.height - 2;
+				Runner.instance_.tRex.midair = true;
+				Runner.instance_.tRex.jumping = true;
+				this.tRex.reachedMinHeight = false;
+				this.tRex.jumpVelocity = 10;
 			} else {
 				this.gameOver();
 			}

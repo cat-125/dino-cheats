@@ -90,7 +90,7 @@
 /* Button */
 
 .cgui-btn {
-	background: #4296FA66;
+	background: #4296FA66 !important;
 	padding: 4px;
 	width: auto;
 	border-radius: 0;
@@ -99,11 +99,11 @@
 }
 
 .cgui-btn:hover {
-	background: #4296FAFF;
+	background: #4296FAFF !important;
 }
 
 .cgui-btn:active {
-	background: #0F87FAFF;
+	background: #0F87FAFF !important;
 	color: #fff;
 	transition: .15s;
 }

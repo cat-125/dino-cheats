@@ -66,23 +66,15 @@ function initCheats() {
 	 ***** Player ******************
 	 ******************************/
 
-	const speedInput = new cheatgui.Input('Speed');
-	const speedBtn = new cheatgui.Button('Set speed', 8);
-	speedBtn.onClick(() => {
-		const val = speedInput.getText();
-
-		if (!isNaN(+val)) Runner.instance_.currentSpeed = +val;
-	});
+	const speedInput = new cheatgui.NumberInput('Speed', 8);
+	const speedBtn = new cheatgui.Button('Set speed');
+	speedBtn.onClick(() => speedInput.getValue());
 	playerMods.append(speedInput);
 	playerMods.append(speedBtn);
 
-	const jumpHeightInput = new cheatgui.Input('Jump height');
-	const jumpHeightBtn = new cheatgui.Button('Set jump height', 10);
-	jumpHeightBtn.onClick(() => {
-		const val = jumpHeightInput.getText();
-
-		if (!isNaN(+val)) Runner.instance_.tRex.setJumpVelocity(+val);
-	});
+	const jumpHeightInput = new cheatgui.NumberInput('Jump height', 10);
+	const jumpHeightBtn = new cheatgui.Button('Set jump height');
+	jumpHeightBtn.onClick(() => Runner.instance_.tRex.setJumpVelocity(jumpHeightInput.getValue()));
 	playerMods.append(jumpHeightInput);
 	playerMods.append(jumpHeightBtn);
 
@@ -105,11 +97,33 @@ function initCheats() {
 	airWalkSwitch.onChange((_, val) => Runner.instance_.tRex.groundYPos = val ? 0 : 93);
 	playerMods.append(airWalkSwitch);
 
+	let bhopInterval;
+	const bhopSwitch = new cheatgui.Switch('Bhop');
+	bhopSwitch.onChange((_, val) => {
+		if (val) {
+			bhopInterval = setInterval(() => {
+				dispatchKey("keydown", 32);
+				dispatchKey("keyup", 32);
+			}, 50);
+		} else {
+			clearInterval(bhopInterval);
+		}
+	});
+	playerMods.append(bhopSwitch);
+
+	const autoPlayFrequency = new cheatgui.Slider({
+		label: 'Auto play frequency',
+		min: 16,
+		value: 100,
+		max: 1000
+	});
+	playerMods.append(autoPlayFrequency);
+
 	let autoPlayInterval;
 	const autoPlaySwitch = new cheatgui.Switch('Auto play');
 	autoPlaySwitch.onChange((_, val) => {
 		if (val) {
-			setInterval(autoPlay, 100);
+			autoPlayInterval = setInterval(autoPlay, autoPlayFrequency.getValue());
 		} else {
 			clearInterval(autoPlayInterval);
 		}
@@ -520,8 +534,6 @@ function initCheats() {
 }
 
 function drawTrajectory(ctx, x, y, width, height, vx, vy, gravity) {
-	const cfg = Runner.instance_.tRex.config;
-
 	// Calculate the initial position
 	ctx.beginPath();
 	ctx.moveTo(x + width / 2, y + height / 2);

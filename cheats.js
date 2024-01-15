@@ -37,8 +37,8 @@ function initCheats() {
 	win.append(miscMods);
 
 	/******************************
-	***** Game ********************
-	******************************/
+	 ***** Game ********************
+	 ******************************/
 
 	const scoreInput = new cheatgui.Input('Score');
 	const scoreBtn = new cheatgui.Button('Set score');
@@ -63,8 +63,8 @@ function initCheats() {
 
 
 	/******************************
-	***** Player ******************
-	******************************/
+	 ***** Player ******************
+	 ******************************/
 
 	const speedInput = new cheatgui.Input('Speed');
 	const speedBtn = new cheatgui.Button('Set speed', 8);
@@ -90,7 +90,7 @@ function initCheats() {
 	noClipSwitch.onChange((_, val) => {
 		if (val) {
 			if (!gameOver) gameOver = Runner.instance_.gameOver.bind(Runner.instance_);
-			Runner.instance_.gameOver = () => { };
+			Runner.instance_.gameOver = () => {};
 		} else {
 			Runner.instance_.gameOver = gameOver;
 		}
@@ -121,8 +121,8 @@ function initCheats() {
 	playerMods.append(obstcaleBypassSwitch);
 
 	/******************************
-	***** Visuals *****************
-	******************************/
+	 ***** Visuals *****************
+	 ******************************/
 
 	const espSwitch = new cheatgui.Switch('ESP');
 	espSwitch.onChange((_, val) => cheats.esp = val);
@@ -165,8 +165,8 @@ function initCheats() {
 
 
 	/******************************
-	***** Obstcales ***************
-	******************************/
+	 ***** Obstcales ***************
+	 ******************************/
 
 	const spawnObstcaleBtn = new cheatgui.Button('Spawn obstcale');
 	spawnObstcaleBtn.onClick(() => {
@@ -175,8 +175,8 @@ function initCheats() {
 	obstcaleMods.append(spawnObstcaleBtn);
 
 	/******************************
-	***** Miscs *******************
-	******************************/
+	 ***** Miscs *******************
+	 ******************************/
 
 	let clickEventListener;
 	const forceFocusSwitch = new cheatgui.Switch('Force focus');
@@ -192,8 +192,8 @@ function initCheats() {
 	miscMods.append(forceFocusSwitch);
 
 	/******************************
-	***** Custom functions ********
-	******************************/
+	 ***** Custom functions ********
+	 ******************************/
 
 	class CollisionBox {
 		constructor(x, y, w, h) {
@@ -306,7 +306,7 @@ function initCheats() {
 		return false;
 	}
 
-	Runner.instance_.update = (function () {
+	Runner.instance_.update = (function() {
 		this.updatePending = false;
 
 		let now = performance.now();
@@ -349,8 +349,8 @@ function initCheats() {
 					this.currentSpeed += this.config.ACCELERATION;
 				}
 			} else if (cheats.obstcaleBypass) {
-				this.tRex.yPos = this.horizon.obstacles[0].yPos
-					- this.horizon.obstacles[0].typeConfig.height - 2;
+				this.tRex.yPos = this.horizon.obstacles[0].yPos -
+					this.horizon.obstacles[0].typeConfig.height - 2;
 				Runner.instance_.tRex.midair = true;
 				Runner.instance_.tRex.jumping = true;
 				this.tRex.reachedMinHeight = false;
@@ -390,7 +390,7 @@ function initCheats() {
 		}
 
 		if (this.playing || (!this.activated &&
-			this.tRex.blinkCount < Runner.config.MAX_BLINK_COUNT)) {
+				this.tRex.blinkCount < Runner.config.MAX_BLINK_COUNT)) {
 			this.tRex.update(deltaTime);
 		}
 
@@ -412,13 +412,6 @@ function initCheats() {
 				// TODO
 			}
 
-			if (cheats.trajectory) {
-				drawTrajectory(ctx, this.tRex.xPos, this.tRex.yPos, this.tRex.config.WIDTH,
-					this.tRex.config.HEIGHT, this.currentSpeed,
-					this.tRex.jumpVelocity,
-					this.tRex.config.GRAVITY);
-			}
-
 			if (cheats.esp) {
 				const isObstacleNearby =
 					obstacle.xPos < 25 * this.currentSpeed - obstacle.width / 2;
@@ -430,9 +423,26 @@ function initCheats() {
 			if (cheats.espInfo) {
 				ctx.fillStyle = '#000';
 				ctx.font = "8px Arial";
-				ctx.fillText("Type: " + obstacle.typeConfig.type, obstacle.xPos, obstacle.yPos - 10);
+				ctx.fillText(obstacle.typeConfig.type, obstacle.xPos, obstacle.yPos - 10);
+				ctx.fillText('Size: ' + obstacle.size, obstacle.xPos, obstacle.yPos - 3);
 			}
 		});
+		
+		if (cheats.espInfo) {
+			ctx.fillStyle = '#000';
+			ctx.font = "8px Arial";
+			ctx.fillText('Speed: ' + this.currentSpeed.toFixed(2), this.tRex.xPos, this.tRex.yPos - 10);
+			ctx.fillText('Jump velocity: ' + this.tRex.jumpVelocity.toFixed(1), this.tRex.xPos, this.tRex.yPos - 3);
+		}
+
+		if (cheats.trajectory) {
+			ctx.strokeStyle = '#000';
+			drawTrajectory(ctx, this.tRex.xPos, this.tRex.yPos, this.tRex.config.WIDTH,
+				this.tRex.config.HEIGHT, this.currentSpeed,
+				this.tRex.jumpVelocity,
+				this.tRex.config.GRAVITY);
+		}
+		
 		ctx.restore();
 
 		if (cheats.hitboxes && this.horizon.obstacles.length > 0) {
@@ -466,7 +476,7 @@ function initCheats() {
 		}
 
 		if (this.playing || (!this.activated &&
-			this.tRex.blinkCount < Runner.config.MAX_BLINK_COUNT)) {
+				this.tRex.blinkCount < Runner.config.MAX_BLINK_COUNT)) {
 			this.scheduleNextUpdate();
 		}
 	}).bind(Runner.instance_);
@@ -516,19 +526,15 @@ function drawTrajectory(ctx, x, y, width, height, vx, vy, gravity) {
 	ctx.beginPath();
 	ctx.moveTo(x + width / 2, y + height / 2);
 
-	let speedDrop = false;
-
 	// Create a loop that iterates as long as the player's y position is less than 93
 	while (y < 93) {
 		// Calculate the next position of the player
 		x += vx;
-		y += speedDrop ? vy * cfg.SPEED_DROP_COEFFICENT : vy;
+		y += vy;
 		vy += gravity;
 
 		// Draw a line between the current position and the next position on the canvas
 		ctx.lineTo(x + width / 2, y + height / 2);
-
-		//if (y < cfg.MAX_JUMP_HEIGHT) speedDrop = true;
 	}
 
 	ctx.stroke();

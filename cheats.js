@@ -7,8 +7,12 @@ const cheats = {
 	trajectory: false,
 	jumpHelper: false,
 	noSpeedIncrease: false,
-	obstcaleBypass: false
+	obstcaleBypass: false,
+	bhop: false,
+	jumpFix: true
 };
+
+let isJumpDown = false;
 
 function initCheats() {
 	const win = new cheatgui.Window({
@@ -97,18 +101,8 @@ function initCheats() {
 	airWalkSwitch.onChange((_, val) => Runner.instance_.tRex.groundYPos = val ? 0 : 93);
 	playerMods.append(airWalkSwitch);
 
-	let bhopInterval;
 	const bhopSwitch = new cheatgui.Switch('Bhop');
-	bhopSwitch.onChange((_, val) => {
-		if (val) {
-			bhopInterval = setInterval(() => {
-				dispatchKey("keydown", 32);
-				dispatchKey("keyup", 32);
-			}, 50);
-		} else {
-			clearInterval(bhopInterval);
-		}
-	});
+	bhopSwitch.onChange((_, val) => cheats.bhop = val);
 	playerMods.append(bhopSwitch);
 
 	const autoPlayFrequency = new cheatgui.Slider({
@@ -196,7 +190,7 @@ function initCheats() {
 	const forceFocusSwitch = new cheatgui.Switch('Force focus');
 	forceFocusSwitch.onChange((_, val) => {
 		if (val) {
-			blurEventListener = document.addEventListener('click', () => {
+			clickEventListener = document.addEventListener('click', () => {
 				Runner.instance_.canvas.focus();
 			});
 		} else {
@@ -204,6 +198,10 @@ function initCheats() {
 		}
 	});
 	miscMods.append(forceFocusSwitch);
+
+	const fixSwitch = new cheatgui.Switch('Jump fix', true);
+	fixSwitch.onChange((_, val) => cheats.jumpFix = val);
+	miscMods.append(fixSwitch);
 
 	/******************************
 	 ***** Custom functions ********
@@ -441,7 +439,7 @@ function initCheats() {
 				ctx.fillText('Size: ' + obstacle.size, obstacle.xPos, obstacle.yPos - 3);
 			}
 		});
-		
+
 		if (cheats.espInfo) {
 			ctx.fillStyle = '#000';
 			ctx.font = "8px Arial";
@@ -456,7 +454,7 @@ function initCheats() {
 				this.tRex.jumpVelocity,
 				this.tRex.config.GRAVITY);
 		}
-		
+
 		ctx.restore();
 
 		if (cheats.hitboxes && this.horizon.obstacles.length > 0) {
@@ -495,7 +493,80 @@ function initCheats() {
 		}
 	}).bind(Runner.instance_);
 
+	Trex.animFrames = {
+		WAITING: {
+			frames: [44, 0],
+			msPerFrame: 1000 / 3
+		},
+		RUNNING: {
+			frames: [88, 132],
+			msPerFrame: 1000 / 12
+		},
+		CRASHED: {
+			frames: [220],
+			msPerFrame: 1000 / 60
+		},
+		JUMPING: {
+			frames: [0],
+			msPerFrame: 1000 / 60
+		},
+		DUCKING: {
+			frames: [264, 323],
+			msPerFrame: 1000 / 8
+		}
+	};
+
+	Runner.instance_.tRex.updateJump = (function(deltaTime, speed) {
+		var msPerFrame = Trex.animFrames[this.status].msPerFrame;
+		var framesElapsed = deltaTime / msPerFrame;
+
+		// Speed drop makes Trex fall faster.
+		if (this.speedDrop) {
+			this.yPos += Math.round(this.jumpVelocity *
+				this.config.SPEED_DROP_COEFFICIENT * framesElapsed);
+		} else {
+			this.yPos += Math.round(this.jumpVelocity * framesElapsed);
+		}
+
+		this.jumpVelocity += this.config.GRAVITY * framesElapsed;
+
+		// Minimum height has been reached.
+		if (this.yPos < this.minJumpHeight || this.speedDrop) {
+			this.reachedMinHeight = true;
+		}
+
+		// Reached max height
+		if (this.yPos < this.config.MAX_JUMP_HEIGHT || this.speedDrop) {
+			this.endJump();
+		}
+
+		// Back down at ground level. Jump completed.
+		if (this.yPos > this.groundYPos) {
+			this.reset();
+			this.jumpCount++;
+			if (cheats.bhop) jump();
+			if (cheats.jumpFix && isJumpDown) jump();
+		}
+	}).bind(Runner.instance_.tRex);
+	
+	document.addEventListener('keydown', e => {
+		if (e.keyCode == 32 || e.keyCode == 40) isJumpDown = true;
+	});	
+	document.addEventListener('keyup', e => {
+		if (e.keyCode == 32 || e.keyCode == 40) isJumpDown = false;
+	});
+	document.addEventListener('touchstart', e => {
+		isJumpDown = true;
+	});
+	document.addEventListener('touchend', e => {
+		isJumpDown = false;
+	});
+
 	/*****************************/
+
+	function jump() {
+		Runner.instance_.tRex.startJump(Runner.instance_.currentSpeed);
+	}
 
 	function dispatchKey(type, key) {
 		document.dispatchEvent(new KeyboardEvent(type, { keyCode: key }));

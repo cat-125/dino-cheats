@@ -12,10 +12,10 @@ const cheats = {
 	trajectory: false,
 	jumpHelper: false,
 	noSpeedIncrease: false,
-	obstcaleBypass: false,
+	obstacleBypass: false,
 	bhop: false,
 	jumpFix: true,
-	noObstcales: false
+	noObstacles: false
 };
 
 let isJumpDown = false;
@@ -42,8 +42,8 @@ function initCheats() {
 	const visualMods = new cheatgui.Tree('Visuals');
 	win.append(visualMods);
 
-	const obstcaleMods = new cheatgui.Tree('Obstcales');
-	win.append(obstcaleMods);
+	const obstacleMods = new cheatgui.Tree('Obstacles');
+	win.append(obstacleMods);
 
 	const miscMods = new cheatgui.Tree('Miscs');
 	win.append(miscMods);
@@ -132,9 +132,9 @@ function initCheats() {
 	});
 	playerMods.append(autoPlaySwitch);
 
-	const obstcaleBypassSwitch = new cheatgui.Switch('Obstcale bypass');
-	obstcaleBypassSwitch.onChange((_, val) => cheats.obstcaleBypass = val);
-	playerMods.append(obstcaleBypassSwitch);
+	const obstacleBypassSwitch = new cheatgui.Switch('Obstacle bypass');
+	obstacleBypassSwitch.onChange((_, val) => cheats.obstacleBypass = val);
+	playerMods.append(obstacleBypassSwitch);
 
 	/******************************
 	 ***** Visuals *****************
@@ -201,24 +201,24 @@ function initCheats() {
 
 
 	/******************************
-	 ***** Obstcales ***************
+	 ***** Obstacles ***************
 	 ******************************/
 
-	const spawnObstcaleBtn = new cheatgui.Button('Spawn obstcale');
-	spawnObstcaleBtn.onClick(() => {
+	const spawnObstacleBtn = new cheatgui.Button('Spawn obstacle');
+	spawnObstacleBtn.onClick(() => {
 		Runner.instance_.horizon.addNewObstacle(Runner.instance_.currentSpeed);
 	});
-	obstcaleMods.append(spawnObstcaleBtn);
+	obstacleMods.append(spawnObstacleBtn);
 
-	const removeObstcaleBtn = new cheatgui.Button('Remove obstcale');
-	removeObstcaleBtn.onClick(() => {
-		Runner.instance_.horizon.removeFirstObstcale;
+	const removeObstacleBtn = new cheatgui.Button('Remove obstacle');
+	removeObstacleBtn.onClick(() => {
+		Runner.instance_.horizon.removeFirstObstacle;
 	});
-	obstcaleMods.append(removeObstcaleBtn);
+	obstacleMods.append(removeObstacleBtn);
 
-	const noObstcalesSwitch = new cheatgui.Switch('No obstcales');
-	noObstcalesSwitch.onChange((_, val) => cheats.noObstcales = val);
-	obstcaleMods.append(noObstcalesSwitch);
+	const noObstaclesSwitch = new cheatgui.Switch('No obstacles');
+	noObstaclesSwitch.onChange((_, val) => cheats.noObstacles = val);
+	obstacleMods.append(noObstaclesSwitch);
 
 	/******************************
 	 ***** Miscs *******************
@@ -398,7 +398,7 @@ function initCheats() {
 				if (this.currentSpeed < this.config.MAX_SPEED && !cheats.noSpeedIncrease) {
 					this.currentSpeed += this.config.ACCELERATION;
 				}
-			} else if (cheats.obstcaleBypass) {
+			} else if (cheats.obstacleBypass) {
 				this.tRex.yPos = this.horizon.obstacles[0].yPos -
 					this.horizon.obstacles[0].typeConfig.height - 2;
 				Runner.instance_.tRex.midair = true;

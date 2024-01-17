@@ -435,7 +435,7 @@ function initCheats() {
 		this.horizon.obstacles.forEach(obstacle => {
 			const isObstacleNearby =
 				obstacle.xPos < 25 * this.currentSpeed - obstacle.width / 2;
-				
+
 			if (cheats.tracers) {
 				if (cheats.tracersOutline) {
 					ctx.strokeStyle = '#000';
@@ -541,17 +541,20 @@ function initCheats() {
 				obstacle.typeConfig.height - 2);
 			const collisionBoxes = obstacle.collisionBoxes;
 
+			ctx.lineWidth = 1;
+			ctx.strokeStyle = '#0f0';
+			
 			for (let t = 0; t < tRexCollisionBoxes.length; t++) {
-				for (let i = 0; i < collisionBoxes.length; i++) {
-					// Adjust the box to actual positions.
-					const adjTrexBox =
-						createAdjustedCollisionBox(tRexCollisionBoxes[t], tRexBox);
-					const adjObstacleBox =
-						createAdjustedCollisionBox(collisionBoxes[i], obstacleBox);
+				const adjBox =
+					createAdjustedCollisionBox(tRexCollisionBoxes[t], tRexBox);
+				ctx.strokeRect(adjBox.x, adjBox.y, adjBox.width, adjBox.height);
+			}
 
-					// Draw boxes for debug.
-					drawCollisionBoxes(Runner.instance_.canvasCtx, adjTrexBox, adjObstacleBox);
-				}
+			ctx.strokeStyle = '#f00';
+			for (let i = 0; i < collisionBoxes.length; i++) {
+				const adjBox =
+					createAdjustedCollisionBox(collisionBoxes[i], obstacleBox);
+				ctx.strokeRect(adjBox.x, adjBox.y, adjBox.width, adjBox.height);
 			}
 		}
 

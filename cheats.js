@@ -8,6 +8,7 @@ const cheats = {
 	tracersOutline: false,
 	hitboxes: false,
 	outerHitboxes: false,
+	blackHitboxes: false,
 	trajectory: false,
 	jumpHelper: false,
 	noSpeedIncrease: false,
@@ -166,15 +167,19 @@ function initCheats() {
 	tracersOutlineSwitch.onChange((_, val) => cheats.tracersOutline = val);
 	visualMods.append(tracersOutlineSwitch);
 
-	const hitboxesSwitch = new cheatgui.Switch('Show inner hitboxes');
+	const hitboxesSwitch = new cheatgui.Switch('Inner hitboxes');
 	hitboxesSwitch.onChange((_, val) => cheats.hitboxes = val);
 	visualMods.append(hitboxesSwitch);
 
-	const outerHitboxesSwitch = new cheatgui.Switch('Show outer hitboxes');
+	const blackHitboxesSwitch = new cheatgui.Switch('Black hitboxes');
+	blackHitboxesSwitch.onChange((_, val) => cheats.blackHitboxes = val);
+	visualMods.append(blackHitboxesSwitch);
+
+	const outerHitboxesSwitch = new cheatgui.Switch('Outer hitboxes');
 	outerHitboxesSwitch.onChange((_, val) => cheats.outerHitboxes = val);
 	visualMods.append(outerHitboxesSwitch);
 
-	const trajectorySwitch = new cheatgui.Switch('Show trajectory');
+	const trajectorySwitch = new cheatgui.Switch('Trajectory');
 	trajectorySwitch.onChange((_, val) => cheats.trajectory = val);
 	visualMods.append(trajectorySwitch);
 
@@ -523,8 +528,6 @@ function initCheats() {
 				this.tRex.config.GRAVITY);
 		}
 
-		ctx.restore();
-
 		if (cheats.hitboxes && this.horizon.obstacles.length > 0) {
 			const tRexBox = new CollisionBox(
 				this.tRex.xPos + 1,
@@ -557,6 +560,39 @@ function initCheats() {
 				ctx.strokeRect(adjBox.x, adjBox.y, adjBox.width, adjBox.height);
 			}
 		}
+
+		if (cheats.blackHitboxes && this.horizon.obstacles.length > 0) {
+			const tRexBox = new CollisionBox(
+				this.tRex.xPos + 1,
+				this.tRex.yPos + 1,
+				this.tRex.config.WIDTH - 2,
+				this.tRex.config.HEIGHT - 2);
+			const tRexCollisionBoxes = this.tRex.ducking ?
+				Trex.collisionBoxes.DUCKING : Trex.collisionBoxes.RUNNING;
+			const obstacle = this.horizon.obstacles[0];
+			const obstacleBox = new CollisionBox(
+				obstacle.xPos + 1,
+				obstacle.yPos + 1,
+				obstacle.typeConfig.width * obstacle.size - 2,
+				obstacle.typeConfig.height - 2);
+			const collisionBoxes = obstacle.collisionBoxes;
+
+			ctx.fillStyle = '#000';
+			
+			for (let t = 0; t < tRexCollisionBoxes.length; t++) {
+				const adjBox =
+					createAdjustedCollisionBox(tRexCollisionBoxes[t], tRexBox);
+				ctx.fillRect(adjBox.x, adjBox.y, adjBox.width, adjBox.height);
+			}
+
+			for (let i = 0; i < collisionBoxes.length; i++) {
+				const adjBox =
+					createAdjustedCollisionBox(collisionBoxes[i], obstacleBox);
+				ctx.fillRect(adjBox.x, adjBox.y, adjBox.width, adjBox.height);
+			}
+		}
+
+		ctx.restore();
 
 		if (this.playing || (!this.activated &&
 				this.tRex.blinkCount < Runner.config.MAX_BLINK_COUNT)) {

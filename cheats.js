@@ -1,4 +1,5 @@
 const cheats = {
+	playerEsp: false,
 	esp: false,
 	espOutline: false,
 	espInfo: false,
@@ -136,6 +137,10 @@ function initCheats() {
 	/******************************
 	 ***** Visuals *****************
 	 ******************************/
+
+	const pEspSwitch = new cheatgui.Switch('Player ESP');
+	pEspSwitch.onChange((_, val) => cheats.playerEsp = val);
+	visualMods.append(pEspSwitch);
 
 	const espSwitch = new cheatgui.Switch('ESP');
 	espSwitch.onChange((_, val) => cheats.esp = val);
@@ -428,6 +433,9 @@ function initCheats() {
 		ctx.strokeWidth = 1;
 		ctx.globalAlpha = 1;
 		this.horizon.obstacles.forEach(obstacle => {
+			const isObstacleNearby =
+				obstacle.xPos < 25 * this.currentSpeed - obstacle.width / 2;
+				
 			if (cheats.tracers) {
 				if (cheats.tracersOutline) {
 					ctx.strokeStyle = '#000';
@@ -437,7 +445,7 @@ function initCheats() {
 					ctx.lineTo(obstacle.xPos + obstacle.width / 2, obstacle.yPos);
 					ctx.stroke();
 				}
-				ctx.strokeStyle = '#0f0';
+				ctx.strokeStyle = isObstacleNearby ? '#f00' : '#ff0';
 				ctx.lineWidth = 1;
 				ctx.beginPath();
 				ctx.moveTo(this.tRex.xPos + this.tRex.config.WIDTH / 2, this.tRex.yPos);
@@ -450,8 +458,6 @@ function initCheats() {
 			}
 
 			if (cheats.esp) {
-				const isObstacleNearby =
-					obstacle.xPos < 25 * this.currentSpeed - obstacle.width / 2;
 				if (cheats.espOutline) {
 					ctx.strokeStyle = '#000';
 					ctx.strokeWidth = 1;
@@ -460,7 +466,7 @@ function initCheats() {
 					ctx.strokeRect(obstacle.xPos - 1, obstacle.yPos - 1,
 						obstacle.width + 2, obstacle.typeConfig.height + 2);
 				}
-				ctx.strokeStyle = isObstacleNearby ? '#f00' : '#0f0';
+				ctx.strokeStyle = isObstacleNearby ? '#f00' : '#ff0';
 				ctx.strokeWidth = 1;
 				ctx.strokeRect(obstacle.xPos, obstacle.yPos,
 					obstacle.width, obstacle.typeConfig.height);
@@ -474,16 +480,31 @@ function initCheats() {
 					ctx.strokeText(obstacle.typeConfig.type, obstacle.xPos, obstacle.yPos - 10);
 					ctx.strokeText('Size: ' + obstacle.size, obstacle.xPos, obstacle.yPos - 3);
 				}
-				ctx.fillStyle = cheats.textOutline ? '#0f0' : '#000';
+				ctx.fillStyle = cheats.textOutline ? (isObstacleNearby ? '#f00' : '#ff0') : '#000';
 				ctx.fillText(obstacle.typeConfig.type, obstacle.xPos, obstacle.yPos - 10);
 				ctx.fillText('Size: ' + obstacle.size, obstacle.xPos, obstacle.yPos - 3);
 			}
 		});
 
+		if (cheats.playerEsp) {
+			if (cheats.espOutline) {
+				ctx.strokeStyle = '#000';
+				ctx.lineWidth = 1;
+				ctx.strokeRect(this.tRex.xPos + 1, this.tRex.yPos + 1,
+					this.tRex.config.WIDTH - 2, this.tRex.config.HEIGHT - 2);
+				ctx.strokeRect(this.tRex.xPos - 1, this.tRex.yPos - 1,
+					this.tRex.config.WIDTH + 2, this.tRex.config.HEIGHT + 2);
+			}
+			ctx.strokeStyle = '#0f0';
+			ctx.lineWidth = 1;
+			ctx.strokeRect(this.tRex.xPos, this.tRex.yPos,
+				this.tRex.config.WIDTH, this.tRex.config.HEIGHT);
+		}
+
 		if (cheats.espInfo) {
 			ctx.font = "8px Arial";
 			if (cheats.textOutline) {
-					ctx.lineWidth = 2;
+				ctx.lineWidth = 2;
 				ctx.strokeStyle = '#000';
 				ctx.strokeText('Speed: ' + this.currentSpeed.toFixed(2), this.tRex.xPos, this.tRex.yPos - 10);
 				ctx.strokeText('Jump velocity: ' + this.tRex.jumpVelocity.toFixed(1), this.tRex.xPos, this.tRex.yPos - 3);

@@ -1,7 +1,10 @@
 const cheats = {
 	esp: false,
+	espOutline: false,
 	espInfo: false,
+	textOutline: false,
 	tracers: false,
+	tracersOutline: false,
 	hitboxes: false,
 	outerHitboxes: false,
 	trajectory: false,
@@ -136,13 +139,25 @@ function initCheats() {
 	espSwitch.onChange((_, val) => cheats.esp = val);
 	visualMods.append(espSwitch);
 
+	const espOutlineSwitch = new cheatgui.Switch('ESP Outline');
+	espOutlineSwitch.onChange((_, val) => cheats.espOutline = val);
+	visualMods.append(espOutlineSwitch);
+
 	const espInfoSwitch = new cheatgui.Switch('ESP info');
 	espInfoSwitch.onChange((_, val) => cheats.espInfo = val);
 	visualMods.append(espInfoSwitch);
 
+	const textOutlineSwitch = new cheatgui.Switch('Text Outline');
+	textOutlineSwitch.onChange((_, val) => cheats.textOutline = val);
+	visualMods.append(textOutlineSwitch);
+
 	const tracersSwitch = new cheatgui.Switch('Tracers');
 	tracersSwitch.onChange((_, val) => cheats.tracers = val);
 	visualMods.append(tracersSwitch);
+
+	const tracersOutlineSwitch = new cheatgui.Switch('Tracers Outline');
+	tracersOutlineSwitch.onChange((_, val) => cheats.tracersOutline = val);
+	visualMods.append(tracersOutlineSwitch);
 
 	const hitboxesSwitch = new cheatgui.Switch('Show inner hitboxes');
 	hitboxesSwitch.onChange((_, val) => cheats.hitboxes = val);
@@ -411,9 +426,17 @@ function initCheats() {
 		ctx.strokeWidth = 1;
 		ctx.globalAlpha = 1;
 		this.horizon.obstacles.forEach(obstacle => {
-			if (cheats.tracers && this.horizon.obstacles.length > 0 && this.canvasCtx) {
-				ctx.save();
+			if (cheats.tracers) {
+				if (cheats.tracersOutline) {
+					ctx.strokeStyle = '#000';
+					ctx.lineWidth = 3;
+					ctx.beginPath();
+					ctx.moveTo(this.tRex.xPos + this.tRex.config.WIDTH / 2, this.tRex.yPos);
+					ctx.lineTo(obstacle.xPos + obstacle.width / 2, obstacle.yPos);
+					ctx.stroke();
+				}
 				ctx.strokeStyle = '#0f0';
+				ctx.lineWidth = 1;
 				ctx.beginPath();
 				ctx.moveTo(this.tRex.xPos + this.tRex.config.WIDTH / 2, this.tRex.yPos);
 				ctx.lineTo(obstacle.xPos + obstacle.width / 2, obstacle.yPos);
@@ -427,28 +450,50 @@ function initCheats() {
 			if (cheats.esp) {
 				const isObstacleNearby =
 					obstacle.xPos < 25 * this.currentSpeed - obstacle.width / 2;
+				if (cheats.espOutline) {
+					ctx.strokeStyle = '#000';
+					ctx.strokeWidth = 1;
+					ctx.strokeRect(obstacle.xPos + 1, obstacle.yPos + 1,
+						obstacle.width - 2, obstacle.typeConfig.height - 2);
+					ctx.strokeRect(obstacle.xPos - 1, obstacle.yPos - 1,
+						obstacle.width + 2, obstacle.typeConfig.height + 2);
+				}
 				ctx.strokeStyle = isObstacleNearby ? '#f00' : '#0f0';
+				ctx.strokeWidth = 1;
 				ctx.strokeRect(obstacle.xPos, obstacle.yPos,
 					obstacle.width, obstacle.typeConfig.height);
 			}
 
 			if (cheats.espInfo) {
-				ctx.fillStyle = '#000';
 				ctx.font = "8px Arial";
+				if (cheats.textOutline) {
+					ctx.lineWidth = 2;
+					ctx.strokeStyle = '#000';
+					ctx.strokeText(obstacle.typeConfig.type, obstacle.xPos, obstacle.yPos - 10);
+					ctx.strokeText('Size: ' + obstacle.size, obstacle.xPos, obstacle.yPos - 3);
+				}
+				ctx.fillStyle = cheats.textOutline ? '#0f0' : '#000';
 				ctx.fillText(obstacle.typeConfig.type, obstacle.xPos, obstacle.yPos - 10);
 				ctx.fillText('Size: ' + obstacle.size, obstacle.xPos, obstacle.yPos - 3);
 			}
 		});
 
 		if (cheats.espInfo) {
-			ctx.fillStyle = '#000';
 			ctx.font = "8px Arial";
+			if (cheats.textOutline) {
+					ctx.lineWidth = 2;
+				ctx.strokeStyle = '#000';
+				ctx.strokeText('Speed: ' + this.currentSpeed.toFixed(2), this.tRex.xPos, this.tRex.yPos - 10);
+				ctx.strokeText('Jump velocity: ' + this.tRex.jumpVelocity.toFixed(1), this.tRex.xPos, this.tRex.yPos - 3);
+			}
+			ctx.fillStyle = cheats.textOutline ? '#0f0' : '#000';
 			ctx.fillText('Speed: ' + this.currentSpeed.toFixed(2), this.tRex.xPos, this.tRex.yPos - 10);
 			ctx.fillText('Jump velocity: ' + this.tRex.jumpVelocity.toFixed(1), this.tRex.xPos, this.tRex.yPos - 3);
 		}
 
 		if (cheats.trajectory) {
 			ctx.strokeStyle = '#000';
+			ctx.strokeWidth = 1;
 			drawTrajectory(ctx, this.tRex.xPos, this.tRex.yPos, this.tRex.config.WIDTH,
 				this.tRex.config.HEIGHT, this.currentSpeed,
 				this.tRex.jumpVelocity,
@@ -548,10 +593,10 @@ function initCheats() {
 			if (cheats.jumpFix && isJumpDown) jump();
 		}
 	}).bind(Runner.instance_.tRex);
-	
+
 	document.addEventListener('keydown', e => {
 		if (e.keyCode == 32 || e.keyCode == 40) isJumpDown = true;
-	});	
+	});
 	document.addEventListener('keyup', e => {
 		if (e.keyCode == 32 || e.keyCode == 40) isJumpDown = false;
 	});

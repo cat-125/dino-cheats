@@ -1297,7 +1297,7 @@ function CollisionBox(x, y, w, h) {
  * @param {number} speed
  * @param {number} opt_xOffset
  */
-function Obstacle(canvasCtx, type, spriteImgPos, dimensions,
+window.Obstacle = function Obstacle(canvasCtx, type, spriteImgPos, dimensions,
     gapCoefficient, speed, opt_xOffset) {
 
   this.canvasCtx = canvasCtx;

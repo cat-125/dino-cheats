@@ -14,7 +14,8 @@ const cheats = {
 	noSpeedIncrease: false,
 	obstcaleBypass: false,
 	bhop: false,
-	jumpFix: true
+	jumpFix: true,
+	noObstcales: false
 };
 
 let isJumpDown = false;
@@ -208,6 +209,16 @@ function initCheats() {
 		Runner.instance_.horizon.addNewObstacle(Runner.instance_.currentSpeed);
 	});
 	obstcaleMods.append(spawnObstcaleBtn);
+
+	const removeObstcaleBtn = new cheatgui.Button('Remove obstcale');
+	removeObstcaleBtn.onClick(() => {
+		Runner.instance_.horizon.removeFirstObstcale;
+	});
+	obstcaleMods.append(removeObstcaleBtn);
+
+	const noObstcalesSwitch = new cheatgui.Switch('No obstcales');
+	noObstcalesSwitch.onChange((_, val) => cheats.noObstcales = val);
+	obstcaleMods.append(noObstcalesSwitch);
 
 	/******************************
 	 ***** Miscs *******************
@@ -546,7 +557,7 @@ function initCheats() {
 
 			ctx.lineWidth = 1;
 			ctx.strokeStyle = '#0f0';
-			
+
 			for (let t = 0; t < tRexCollisionBoxes.length; t++) {
 				const adjBox =
 					createAdjustedCollisionBox(tRexCollisionBoxes[t], tRexBox);
@@ -578,7 +589,7 @@ function initCheats() {
 			const collisionBoxes = obstacle.collisionBoxes;
 
 			ctx.fillStyle = '#000';
-			
+
 			for (let t = 0; t < tRexCollisionBoxes.length; t++) {
 				const adjBox =
 					createAdjustedCollisionBox(tRexCollisionBoxes[t], tRexBox);
@@ -655,6 +666,68 @@ function initCheats() {
 			if (cheats.jumpFix && isJumpDown) jump();
 		}
 	}).bind(Runner.instance_.tRex);
+
+	Runner.instance_.horizon.updateObstacles = (function(deltaTime, currentSpeed) {
+		// Obstacles, move to Horizon layer.
+		var updatedObstacles = this.obstacles.slice(0);
+
+		for (var i = 0; i < this.obstacles.length; i++) {
+			var obstacle = this.obstacles[i];
+			obstacle.update(deltaTime, currentSpeed);
+
+			// Clean up existing obstacles.
+			if (obstacle.remove) {
+				updatedObstacles.shift();
+			}
+		}
+		this.obstacles = updatedObstacles;
+
+		if (this.obstacles.length > 0) {
+			var lastObstacle = this.obstacles[this.obstacles.length - 1];
+
+			if (lastObstacle && !lastObstacle.followingObstacleCreated &&
+				lastObstacle.isVisible() &&
+				(lastObstacle.xPos + lastObstacle.width + lastObstacle.gap) <
+				this.dimensions.WIDTH) {
+				this.addNewObstacle(currentSpeed);
+				lastObstacle.followingObstacleCreated = true;
+			}
+		} else {
+			// Create new obstacles.
+			this.addNewObstacle(currentSpeed);
+		}
+	}).bind(Runner.instance_.horizon);
+
+	function getRandomNum(min, max) {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+	
+	const Obstacle = window.Obstacle;
+
+	Runner.instance_.horizon.addNewObstacle = (function(currentSpeed) {
+		var obstacleTypeIndex = getRandomNum(0, Obstacle.types.length - 1);
+		var obstacleType = Obstacle.types[obstacleTypeIndex];
+
+		// Check for multiples of the same type of obstacle.
+		// Also check obstacle is available at current speed.
+		if (this.duplicateObstacleCheck(obstacleType.type) ||
+			currentSpeed < obstacleType.minSpeed) {
+			this.addNewObstacle(currentSpeed);
+		} else {
+			var obstacleSpritePos = this.spritePos[obstacleType.type];
+
+			this.obstacles.push(new Obstacle(this.canvasCtx, obstacleType,
+				obstacleSpritePos, this.dimensions,
+				this.gapCoefficient, currentSpeed, obstacleType.width));
+
+			this.obstacleHistory.unshift(obstacleType.type);
+
+			if (this.obstacleHistory.length > 1) {
+				this.obstacleHistory.splice(Runner.config.MAX_OBSTACLE_DUPLICATION);
+			}
+		}
+	}).bind(Runner.instance_.horizon);
+
 
 	document.addEventListener('keydown', e => {
 		if (e.keyCode == 32 || e.keyCode == 40) isJumpDown = true;

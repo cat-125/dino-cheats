@@ -686,10 +686,10 @@ function initCheats() {
 
 
 	document.addEventListener('keydown', e => {
-		if (e.keyCode == 32 || e.keyCode == 40) isJumpDown = true;
+		if (e.code == 'Space' || e.code == 'ArrowUp') isJumpDown = true;
 	});
 	document.addEventListener('keyup', e => {
-		if (e.keyCode == 32 || e.keyCode == 40) isJumpDown = false;
+		if (e.code == 'Space' || e.code == 'ArrowUp') isJumpDown = false;
 	});
 	document.addEventListener('touchstart', e => {
 		isJumpDown = true;

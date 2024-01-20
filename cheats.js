@@ -21,8 +21,8 @@ const cheats = {
 let isJumpDown = false;
 
 function initCheats() {
-	const width = Math.min(window.innerWidth - 30, 600);
-	const height = Math.min(width / 6 * 4, 400);
+	const width = Math.min(window.innerWidth - 30, 500);
+	const height = Math.min(width / 6 * 4, 300);
 	const win = new cheatgui.Window({
 		x: window.innerWidth - (width + 15),
 		y: window.innerHeight - (height + 45),

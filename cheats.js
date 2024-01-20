@@ -491,8 +491,7 @@ function initCheats() {
 			ctx.strokeWidth = 1;
 			drawTrajectory(ctx, this.tRex.xPos, this.tRex.yPos, this.tRex.config.WIDTH,
 				this.tRex.config.HEIGHT, this.currentSpeed,
-				this.tRex.jumpVelocity,
-				this.tRex.config.GRAVITY);
+				this.tRex.jumpVelocity);
 		}
 
 		if (cheats.hitboxes && this.horizon.obstacles.length > 0) {
@@ -591,8 +590,8 @@ function initCheats() {
 	};
 
 	Runner.instance_.tRex.updateJump = (function(deltaTime, speed) {
-		var msPerFrame = Trex.animFrames[this.status].msPerFrame;
-		var framesElapsed = deltaTime / msPerFrame;
+		const msPerFrame = Trex.animFrames[this.status].msPerFrame;
+		const framesElapsed = deltaTime / msPerFrame;
 
 		// Speed drop makes Trex fall faster.
 		if (this.speedDrop) {
@@ -625,10 +624,10 @@ function initCheats() {
 
 	Runner.instance_.horizon.updateObstacles = (function(deltaTime, currentSpeed) {
 		// Obstacles, move to Horizon layer.
-		var updatedObstacles = this.obstacles.slice(0);
+		const updatedObstacles = this.obstacles.slice(0);
 
-		for (var i = 0; i < this.obstacles.length; i++) {
-			var obstacle = this.obstacles[i];
+		for (let i = 0; i < this.obstacles.length; i++) {
+			const obstacle = this.obstacles[i];
 			obstacle.update(deltaTime, currentSpeed);
 
 			// Clean up existing obstacles.
@@ -639,7 +638,7 @@ function initCheats() {
 		this.obstacles = updatedObstacles;
 
 		if (this.obstacles.length > 0) {
-			var lastObstacle = this.obstacles[this.obstacles.length - 1];
+			const lastObstacle = this.obstacles[this.obstacles.length - 1];
 
 			if (lastObstacle && !lastObstacle.followingObstacleCreated &&
 				lastObstacle.isVisible() &&
@@ -661,8 +660,8 @@ function initCheats() {
 	const Obstacle = window.Obstacle;
 
 	Runner.instance_.horizon.addNewObstacle = (function(currentSpeed) {
-		var obstacleTypeIndex = getRandomNum(0, Obstacle.types.length - 1);
-		var obstacleType = Obstacle.types[obstacleTypeIndex];
+		const obstacleTypeIndex = getRandomNum(0, Obstacle.types.length - 1);
+		const obstacleType = Obstacle.types[obstacleTypeIndex];
 
 		// Check for multiples of the same type of obstacle.
 		// Also check obstacle is available at current speed.
@@ -670,7 +669,7 @@ function initCheats() {
 			currentSpeed < obstacleType.minSpeed) {
 			this.addNewObstacle(currentSpeed);
 		} else {
-			var obstacleSpritePos = this.spritePos[obstacleType.type];
+			const obstacleSpritePos = this.spritePos[obstacleType.type];
 
 			this.obstacles.push(new Obstacle(this.canvasCtx, obstacleType,
 				obstacleSpritePos, this.dimensions,
@@ -740,7 +739,7 @@ function initCheats() {
 	}
 }
 
-function drawTrajectory(ctx, x, y, width, height, vx, vy, gravity) {
+function drawTrajectory(ctx, x, y, width, height, vx, vy) {
 	// Calculate the initial position
 	ctx.beginPath();
 	ctx.moveTo(x + width / 2, y + height / 2);
@@ -750,7 +749,7 @@ function drawTrajectory(ctx, x, y, width, height, vx, vy, gravity) {
 		// Calculate the next position of the player
 		x += vx;
 		y += vy;
-		vy += gravity;
+		vy += Runner.instance_.tRex.config.GRAVITY;
 
 		// Draw a line between the current position and the next position on the canvas
 		ctx.lineTo(x + width / 2, y + height / 2);

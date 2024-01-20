@@ -102,16 +102,14 @@ function initCheats() {
 	playerMods.append(noClipSwitch);
 
 	const freezeSwitch = new cheatgui.Switch('Freeze');
-	freezeSwitch.onChange((_, val) => Runner.instance_.playingIntro = val);
+	freezeSwitch.bind(Runner.instance_, 'playingIntro');	
 	playerMods.append(freezeSwitch);
 
 	const airWalkSwitch = new cheatgui.Switch('Air walk');
 	airWalkSwitch.onChange((_, val) => Runner.instance_.tRex.groundYPos = val ? 0 : 93);
 	playerMods.append(airWalkSwitch);
 
-	const bhopSwitch = new cheatgui.Switch('Bhop');
-	bhopSwitch.onChange((_, val) => cheats.bhop = val);
-	playerMods.append(bhopSwitch);
+	playerMods.append(new cheatgui.Switch('Bhop').bind(cheats, 'bhop'));
 
 	const autoPlayFrequency = new cheatgui.Slider({
 		label: 'Auto play frequency',
@@ -131,10 +129,8 @@ function initCheats() {
 		}
 	});
 	playerMods.append(autoPlaySwitch);
-
-	const obstacleBypassSwitch = new cheatgui.Switch('Obstacle bypass');
-	obstacleBypassSwitch.onChange((_, val) => cheats.obstacleBypass = val);
-	playerMods.append(obstacleBypassSwitch);
+	
+	playerMods.append(new cheatgui.Switch('Obstacle bypass').bind(cheats, 'obstacleBypass'));
 
 	/******************************
 	 ***** Visuals *****************

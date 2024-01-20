@@ -80,7 +80,7 @@ function initCheats() {
 
 	const speedInput = new cheatgui.NumberInput('Speed', 8);
 	const speedBtn = new cheatgui.Button('Set speed');
-	speedBtn.onClick(() => speedInput.getValue());
+	speedBtn.onClick(() => Runner.instance_.currentSpeed = speedInput.getValue());
 	playerMods.append(speedInput);
 	playerMods.append(speedBtn);
 

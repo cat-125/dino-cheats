@@ -62,9 +62,7 @@ function initCheats() {
 	globalMods.append(scoreInput);
 	globalMods.append(scoreBtn);
 
-	const speedIncrease = new cheatgui.Switch('No speed increase');
-	speedIncrease.onChange((_, val) => cheats.noSpeedIncrease = val);
-	globalMods.append(speedIncrease);
+	globalMods.append(new cheatgui.Switch('No speed increase').bind(cheats, 'noSpeedIncrease'));
 
 	const gameOverBtn = new cheatgui.Button('End game');
 	gameOverBtn.onClick(() => {
@@ -101,9 +99,7 @@ function initCheats() {
 	});
 	playerMods.append(noClipSwitch);
 
-	const freezeSwitch = new cheatgui.Switch('Freeze');
-	freezeSwitch.bind(Runner.instance_, 'playingIntro');	
-	playerMods.append(freezeSwitch);
+	playerMods.append(new cheatgui.Switch('Freeze').bind(Runner.instance_, 'playingIntro'));
 
 	const airWalkSwitch = new cheatgui.Switch('Air walk');
 	airWalkSwitch.onChange((_, val) => Runner.instance_.tRex.groundYPos = val ? 0 : 93);
@@ -136,57 +132,31 @@ function initCheats() {
 	 ***** Visuals *****************
 	 ******************************/
 
-	const pEspSwitch = new cheatgui.Switch('Player ESP');
-	pEspSwitch.onChange((_, val) => cheats.playerEsp = val);
-	visualMods.append(pEspSwitch);
+	visualMods.append(new cheatgui.Switch('Player ESP').bind(cheats, 'playerEsp'));
 
-	const espSwitch = new cheatgui.Switch('ESP');
-	espSwitch.onChange((_, val) => cheats.esp = val);
-	visualMods.append(espSwitch);
+	visualMods.append(new cheatgui.Switch('ESP').bind(cheats, 'esp'));
 
-	const espOutlineSwitch = new cheatgui.Switch('ESP Outline');
-	espOutlineSwitch.onChange((_, val) => cheats.espOutline = val);
-	visualMods.append(espOutlineSwitch);
+	visualMods.append(new cheatgui.Switch('ESP Outline').bind(cheats, 'espOutline'));
 
-	const espInfoSwitch = new cheatgui.Switch('ESP info');
-	espInfoSwitch.onChange((_, val) => cheats.espInfo = val);
-	visualMods.append(espInfoSwitch);
+	visualMods.append(new cheatgui.Switch('ESP info').bind(cheats, 'espInfo'));
 
-	const textOutlineSwitch = new cheatgui.Switch('Text Outline');
-	textOutlineSwitch.onChange((_, val) => cheats.textOutline = val);
-	visualMods.append(textOutlineSwitch);
+	visualMods.append(new cheatgui.Switch('Text Outline').bind(cheats, 'textOutline'));
 
-	const tracersSwitch = new cheatgui.Switch('Tracers');
-	tracersSwitch.onChange((_, val) => cheats.tracers = val);
-	visualMods.append(tracersSwitch);
+	visualMods.append(new cheatgui.Switch('Tracers').bind(cheats, 'tracers'));
 
-	const tracersOutlineSwitch = new cheatgui.Switch('Tracers Outline');
-	tracersOutlineSwitch.onChange((_, val) => cheats.tracersOutline = val);
-	visualMods.append(tracersOutlineSwitch);
+	visualMods.append(new cheatgui.Switch('Tracers Outline').bind(cheats, 'tracersOutline'));
 
-	const hitboxesSwitch = new cheatgui.Switch('Inner hitboxes');
-	hitboxesSwitch.onChange((_, val) => cheats.hitboxes = val);
-	visualMods.append(hitboxesSwitch);
+	visualMods.append(new cheatgui.Switch('Inner hitboxes').bind(cheats, 'hitboxes'));
 
-	const blackHitboxesSwitch = new cheatgui.Switch('Black hitboxes');
-	blackHitboxesSwitch.onChange((_, val) => cheats.blackHitboxes = val);
-	visualMods.append(blackHitboxesSwitch);
+	visualMods.append(new cheatgui.Switch('Black hitboxes').bind(cheats, 'blackHitboxes'));
 
-	const outerHitboxesSwitch = new cheatgui.Switch('Outer hitboxes');
-	outerHitboxesSwitch.onChange((_, val) => cheats.outerHitboxes = val);
-	visualMods.append(outerHitboxesSwitch);
+	visualMods.append(new cheatgui.Switch('Outer hitboxes').bind(cheats, 'outerHitboxes'));
 
-	const trajectorySwitch = new cheatgui.Switch('Trajectory');
-	trajectorySwitch.onChange((_, val) => cheats.trajectory = val);
-	visualMods.append(trajectorySwitch);
+	visualMods.append(new cheatgui.Switch('Trajectory').bind(cheats, 'trajectory'));
 
-	const jumpHelperSwitch = new cheatgui.Switch('Jump helper');
-	jumpHelperSwitch.onChange((_, val) => cheats.jumpHelper = val);
-	visualMods.append(jumpHelperSwitch);
+	visualMods.append(new cheatgui.Switch('Jump helper').bind(cheats, 'jumpHelper'));
 
-	const moonSwitch = new cheatgui.Switch('Night sky');
-	moonSwitch.onChange((_, val) => Runner.instance_.inverted = val);
-	visualMods.append(moonSwitch);
+	visualMods.append(new cheatgui.Switch('Night sky').bind(Runner.instance_, 'inverted'));
 
 	const invertBtn = new cheatgui.Button('Invert');
 	invertBtn.onClick(() => {
@@ -199,30 +169,23 @@ function initCheats() {
 	/******************************
 	 ***** Obstacles ***************
 	 ******************************/
-
-	const spawnObstacleBtn = new cheatgui.Button('Spawn obstacle');
-	spawnObstacleBtn.onClick(() => {
+	
+	obstacleMods.append(new cheatgui.Button('Spawn obstacle').onClick(() => {
 		Runner.instance_.horizon.addNewObstacle(Runner.instance_.currentSpeed);
-	});
-	obstacleMods.append(spawnObstacleBtn);
+	}));
 
-	const removeObstacleBtn = new cheatgui.Button('Remove obstacle');
-	removeObstacleBtn.onClick(() => {
-		Runner.instance_.horizon.removeFirstObstacle;
-	});
-	obstacleMods.append(removeObstacleBtn);
+	obstacleMods.append(new cheatgui.Button('Remove obstacle').onClick(() => {
+		Runner.instance_.horizon.removeFirstObstacle();
+	}));
 
-	const noObstaclesSwitch = new cheatgui.Switch('No obstacles');
-	noObstaclesSwitch.onChange((_, val) => cheats.noObstacles = val);
-	obstacleMods.append(noObstaclesSwitch);
+	obstacleMods.append(new cheatgui.Switch('No obstacles').bind(cheats, 'noObstacles'));
 
 	/******************************
 	 ***** Miscs *******************
 	 ******************************/
 
 	let clickEventListener;
-	const forceFocusSwitch = new cheatgui.Switch('Force focus');
-	forceFocusSwitch.onChange((_, val) => {
+	miscMods.append(new cheatgui.Switch('Force focus').onChange((_, val) => {
 		if (val) {
 			clickEventListener = document.addEventListener('click', () => {
 				Runner.instance_.canvas.focus();
@@ -230,12 +193,9 @@ function initCheats() {
 		} else {
 			document.removeEventListener('click', clickEventListener);
 		}
-	});
-	miscMods.append(forceFocusSwitch);
+	}));
 
-	const fixSwitch = new cheatgui.Switch('Jump fix', true);
-	fixSwitch.onChange((_, val) => cheats.jumpFix = val);
-	miscMods.append(fixSwitch);
+	miscMods.append(new cheatgui.Switch('Jump fix').bind(cheats, 'jumpFix'));
 
 	/******************************
 	 ***** Custom functions ********

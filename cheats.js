@@ -52,10 +52,10 @@ function initCheats() {
 	 ***** Game ********************
 	 ******************************/
 
-	const scoreInput = new cheatgui.Input('Score');
+	const scoreInput = new cheatgui.NumberInput('Score');
 	const scoreBtn = new cheatgui.Button('Set score');
 	scoreBtn.onClick(() => {
-		const val = scoreInput.getText();
+		const val = scoreInput.getValue();
 
 		if (!isNaN(+val)) Runner.instance_.distanceRan = +val / Runner.instance_.distanceMeter.config.COEFFICIENT;
 	});

@@ -195,7 +195,7 @@ function initCheats() {
 		}
 	}));
 
-	miscMods.append(new cheatgui.Switch('Jump fix').bind(cheats, 'jumpFix'));
+	miscMods.append(new cheatgui.Switch('Jump fix', true).bind(cheats, 'jumpFix'));
 
 	/******************************
 	 ***** Custom functions ********
